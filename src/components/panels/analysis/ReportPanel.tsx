@@ -1,4 +1,4 @@
-import { Grid, Group, Paper, ScrollArea, Stack, Text } from "@mantine/core";
+import { Center, Grid, Group, Paper, ScrollArea, Stack, Text } from "@mantine/core";
 import { IconZoomCheck } from "@tabler/icons-react";
 import cx from "clsx";
 import equal from "fast-deep-equal";
@@ -8,11 +8,13 @@ import { useTranslation } from "react-i18next";
 import { useStore } from "zustand";
 import { commands } from "@/bindings";
 import EvalChart from "@/components/common/EvalChart";
+import MoveQualityIcon from "@/components/common/MoveQualityIcon";
 import ProgressButton from "@/components/common/ProgressButton";
 import { TreeStateContext } from "@/components/common/TreeStateContext";
 import { activeTabAtom, currentReportModalOpenAtom } from "@/state/atoms";
 import { ANNOTATION_INFO, isBasicAnnotation } from "@/utils/annotation";
 import { getGameStats, getMainLine } from "@/utils/chess";
+import { getMoveQualityForAnnotation } from "@/utils/moveIcons";
 import classes from "./AnalysisPanel.module.css";
 import ReportModal from "./ReportModal";
 
@@ -114,6 +116,7 @@ const GameStats = memo(
               const { name, color, translationKey } = ANNOTATION_INFO[s];
               const w = whiteAnnotations[s];
               const b = blackAnnotations[s];
+              const moveQuality = getMoveQualityForAnnotation(s);
               return (
                 <React.Fragment key={annotation}>
                   <Grid.Col
@@ -134,7 +137,19 @@ const GameStats = memo(
                     style={{ textAlign: "center", fontWeight: "bold" }}
                     c={w + b > 0 ? color : undefined}
                   >
-                    {annotation}
+                    {moveQuality ? (
+                      <Center>
+                        <MoveQualityIcon
+                          quality={moveQuality}
+                          alt={annotation}
+                          w={20}
+                          h={20}
+                          style={{ opacity: w + b > 0 ? 1 : 0.55 }}
+                        />
+                      </Center>
+                    ) : (
+                      annotation
+                    )}
                   </Grid.Col>
                   <Grid.Col span={4} c={w + b > 0 ? color : undefined}>
                     {translationKey ? t(`Annotate.${translationKey}`) : name}

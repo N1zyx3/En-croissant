@@ -3,7 +3,9 @@ import { IconFlag } from "@tabler/icons-react";
 import { useAtom } from "jotai";
 import type { ReactNode, RefObject } from "react";
 import { currentShowCommentsAtom, moveNotationTypeAtom } from "@/state/atoms";
+import MoveQualityIcon from "@/components/common/MoveQualityIcon";
 import { ANNOTATION_INFO, type Annotation, addPieceSymbol } from "@/utils/annotation";
+import { getMoveQualityForAnnotation } from "@/utils/moveIcons";
 import classes from "./MoveCell.module.css";
 
 interface MoveCellProps {
@@ -66,7 +68,22 @@ function MoveCell(props: MoveCellProps) {
       <Box component="span" className={classes.moveText}>
         {props.isStart && <IconFlag style={{ marginRight: 5 }} size="0.875rem" />}
         {moveNotationType === "symbols" ? addPieceSymbol(props.move) : props.move}
-        {showComments ? props.annotations.join("") : ""}
+        {showComments &&
+          props.annotations.map((annotation) => {
+            const moveQuality = getMoveQualityForAnnotation(annotation);
+            return moveQuality ? (
+              <MoveQualityIcon
+                key={annotation}
+                quality={moveQuality}
+                alt={annotation}
+                w={16}
+                h={16}
+                style={{ marginLeft: 2, flexShrink: 0 }}
+              />
+            ) : (
+              <span key={annotation}>{annotation}</span>
+            );
+          })}
       </Box>
       {props.rightAccessory && (
         <Box component="span" className={classes.rightAccessory}>

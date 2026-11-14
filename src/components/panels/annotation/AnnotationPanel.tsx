@@ -14,8 +14,10 @@ import { atom, useAtom } from "jotai";
 import { memo, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { useStore } from "zustand";
+import MoveQualityIcon from "@/components/common/MoveQualityIcon";
 import { TreeStateContext } from "@/components/common/TreeStateContext";
 import { ANNOTATION_INFO, type Annotation, isBasicAnnotation } from "@/utils/annotation";
+import { getMoveQualityForAnnotation } from "@/utils/moveIcons";
 import { getNodeAtPath } from "@/utils/treeReducer";
 import AnnotationEditor from "./AnnotationEditor";
 
@@ -33,14 +35,32 @@ const SymbolButton = memo(function SymbolButton({
   const { translationKey, name, color } = ANNOTATION_INFO[annotation];
   const isActive = curAnnotations.includes(annotation);
   const theme = useMantineTheme();
+  const moveQuality = getMoveQualityForAnnotation(annotation);
+
   return (
     <Tooltip label={translationKey ? t(`Annotate.${translationKey}`) : name} position="bottom">
       <ActionIcon
         onClick={() => setAnnotation(annotation)}
-        variant={isActive ? "filled" : "default"}
+        variant={moveQuality ? "transparent" : isActive ? "filled" : "default"}
         color={isBasicAnnotation(annotation) ? color : theme.primaryColor}
+        p={moveQuality ? 0 : undefined}
+        style={
+          moveQuality
+            ? {
+                  opacity: isActive ? 1 : 0.55,
+                  borderRadius: "50%",
+                  boxShadow: isActive
+                      ? `0 0 0 2px var(--mantine-color-${isBasicAnnotation(annotation) ? color : theme.primaryColor}-6)`
+                      : undefined,
+              }
+            : undefined
+        }
       >
-        <Text>{annotation}</Text>
+        {moveQuality ? (
+          <MoveQualityIcon quality={moveQuality} alt={annotation} w="100%" h="100%" />
+        ) : (
+          <Text>{annotation}</Text>
+        )}
       </ActionIcon>
     </Tooltip>
   );

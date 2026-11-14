@@ -1,8 +1,10 @@
 import { Box } from "@mantine/core";
 import type { Color, Square } from "chessops";
 import type { ReactNode } from "react";
+import MoveQualityIcon from "@/components/common/MoveQualityIcon";
 import { ANNOTATION_INFO, type Annotation } from "@/utils/annotation";
 import { squareToCoordinates } from "@/utils/chessops";
+import { getMoveQualityForAnnotation } from "@/utils/moveIcons";
 
 export default function AnnotationHint({
   square,
@@ -15,6 +17,7 @@ export default function AnnotationHint({
 }) {
   const { file, rank } = squareToCoordinates(square, orientation);
   const color = ANNOTATION_INFO[annotation]?.color || "gray";
+  const moveQuality = getMoveQualityForAnnotation(annotation);
 
   return (
     <Box
@@ -27,32 +30,39 @@ export default function AnnotationHint({
       }}
     >
       <Box pl="90%">
-        {
-          <Box
-            style={{
-              transform: "translateY(-40%) translateX(-50%)",
-              zIndex: 100,
-              filter: "url(#shadow)",
-              overflow: "initial",
-              borderRadius: "50%",
-            }}
-            w="45%"
-            h="45%"
-            pos="absolute"
-            bg={color}
-            variant="filled"
-          >
-            <svg viewBox="0 0 100 100">
-              <title>{annotation}</title>
-              <defs>
-                <filter id="shadow">
-                  <feDropShadow dx="0" dy="1" floodOpacity="0.3" stdDeviation="0" />
-                </filter>
-              </defs>
-              <g>{glyphToSvg[annotation]}</g>
-            </svg>
-          </Box>
-        }
+        <Box
+          style={{
+            transform: "translateY(-40%) translateX(-50%)",
+            zIndex: 100,
+            overflow: "initial",
+            borderRadius: "50%",
+          }}
+          w="45%"
+          h="45%"
+          pos="absolute"
+        >
+          {moveQuality ? (
+            <MoveQualityIcon
+              quality={moveQuality}
+              alt={annotation}
+              w="100%"
+              h="100%"
+              style={{ display: "block" }}
+            />
+          ) : (
+            <Box w="100%" h="100%" bg={color} style={{ borderRadius: "50%" }}>
+              <svg viewBox="0 0 100 100">
+                <title>{annotation}</title>
+                <defs>
+                  <filter id="shadow">
+                    <feDropShadow dx="0" dy="1" floodOpacity="0.3" stdDeviation="0" />
+                  </filter>
+                </defs>
+                <g>{glyphToSvg[annotation]}</g>
+              </svg>
+            </Box>
+          )}
+        </Box>
       </Box>
     </Box>
   );
