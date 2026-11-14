@@ -34,7 +34,7 @@ async function getSoundServerPort(): Promise<number> {
     throw new Error("Failed to get sound server port");
 }
 
-export function playSound(capture: boolean, check: boolean) {
+export function playSound(capture: boolean, check: boolean, brilliant = false) {
     // only play at most 1 sound every 75ms
     const now = Date.now();
     if (now - lastTime < 75) {
@@ -46,15 +46,20 @@ export function playSound(capture: boolean, check: boolean) {
     const collection = store.get(soundCollectionAtom);
     const volume = store.get(soundVolumeAtom);
 
-    let type = "Move";
-    if (capture) {
-        type = "Capture";
+    let relativePath: string;
+    if (brilliant) {
+        // Shared across collections: a brilliant move always uses the same cue.
+        relativePath = "Brilliant.wav";
+    } else {
+        let type = "Move";
+        if (capture) {
+            type = "Capture";
+        }
+        if (collection !== "standard" && check) {
+            type = "Check";
+        }
+        relativePath = `${collection}/${type}.mp3`;
     }
-    if (collection !== "standard" && check) {
-        type = "Check";
-    }
-
-    const cacheKey = `${collection}/${type}`;
 
     const playWithUrl = (url: string) => {
         const player = audioPool[poolIndex];
@@ -68,23 +73,23 @@ export function playSound(capture: boolean, check: boolean) {
     if (isLinux()) {
         getSoundServerPort()
             .then((port) => {
-                const url = `http://127.0.0.1:${port}/${collection}/${type}.mp3`;
+                const url = `http://127.0.0.1:${port}/${relativePath}`;
                 playWithUrl(url);
             })
             .catch(() => {
                 // fails if Tauri APIs are unavailable (e.g., in tests)
             });
     } else {
-        const path = `sound/${collection}/${type}.mp3`;
+        const path = `sound/${relativePath}`;
 
-        if (soundUrlCache.has(cacheKey)) {
-            playWithUrl(soundUrlCache.get(cacheKey)!);
+        if (soundUrlCache.has(relativePath)) {
+            playWithUrl(soundUrlCache.get(relativePath)!);
             return;
         }
         resolveResource(path)
             .then((filePath) => {
                 const assetUrl = convertFileSrc(filePath);
-                soundUrlCache.set(cacheKey, assetUrl);
+                soundUrlCache.set(relativePath, assetUrl);
 
                 playWithUrl(assetUrl);
             })

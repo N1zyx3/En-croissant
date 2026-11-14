@@ -141,9 +141,10 @@ export const createTreeStore = (id?: string, initialTree?: TreeState) => {
 
                 const node = getNodeAtPath(state.root, state.position);
                 if (!node || !node.children[childIndex]?.move) return state;
-                const san = node.children[childIndex].san;
+                const child = node.children[childIndex];
+                const san = child.san;
                 if (!san) return state;
-                playSound(san.includes("x"), san.includes("+"));
+                playSound(san.includes("x"), san.includes("+"), child.annotations.includes("!!"));
                 return {
                     ...state,
                     position: [...state.position, childIndex],
@@ -424,10 +425,12 @@ export const createTreeStore = (id?: string, initialTree?: TreeState) => {
                 produce((state) => {
                     state.dirty = true;
                     const node = getNodeAtPath(state.root, state.position);
+                    let brilliant = false;
                     if (node) {
                         if (node.annotations.includes(payload)) {
                             node.annotations = node.annotations.filter((a) => a !== payload);
                         } else {
+                            brilliant = payload === "!!";
                             const newAnnotations = node.annotations.filter(
                                 (a) =>
                                     !ANNOTATION_INFO[a].group ||
@@ -437,6 +440,9 @@ export const createTreeStore = (id?: string, initialTree?: TreeState) => {
                                 ANNOTATION_INFO[a].nag > ANNOTATION_INFO[b].nag ? 1 : -1,
                             );
                         }
+                    }
+                    if (brilliant) {
+                        playSound(false, false, true);
                     }
                 }),
             ),
@@ -552,9 +558,11 @@ function makeMove({
     if (!pos) return;
     const san = makeSan(pos, move);
     if (san === "--") return; // invalid move
+    const i = moveNode.children.findIndex((n) => n.san === san);
+    const brilliant = i !== -1 && moveNode.children[i].annotations.includes("!!");
     pos.play(move);
     if (sound) {
-        playSound(san.includes("x"), san.includes("+"));
+        playSound(san.includes("x"), san.includes("+"), brilliant);
     }
     if (changeHeaders && pos.isEnd()) {
         if (pos.isCheckmate()) {
@@ -571,7 +579,6 @@ function makeMove({
         state.headers.result = "1/2-1/2";
     }
 
-    const i = moveNode.children.findIndex((n) => n.san === san);
     if (i !== -1) {
         if (changePosition) {
             if (state.position === position) {
