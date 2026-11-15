@@ -274,6 +274,19 @@ export default function App() {
         "#141517",
         "#101113",
       ],
+      // Interface color matching the "interesting" move-quality icon.
+      interesting: [
+        "#f4f2ff",
+        "#e6e2fe",
+        "#d4cdfc",
+        "#bdb2fa",
+        "#a394f7",
+        "#8d7cf5",
+        "#7a66f4",
+        "#6b56e8",
+        "#5b47cc",
+        "#4a39a8",
+      ],
     },
     components: {
       ActionIcon: ActionIcon.extend({

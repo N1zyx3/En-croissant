@@ -9,6 +9,7 @@ import type { Annotation } from "./annotation";
 export type MoveQuality =
     | "best"
     | "excellent"
+    | "great"
     | "correct"
     | "book"
     | "brilliant"
@@ -23,6 +24,7 @@ export type MoveQuality =
 export const MOVE_QUALITY_ICON: Record<MoveQuality, string> = {
     best: "/moves/move-best.png",
     excellent: "/moves/move-excellent.png",
+    great: "/moves/move-great.png",
     correct: "/moves/move-correct.png",
     book: "/moves/move-book.png",
     brilliant: "/moves/move-brilliant.png",

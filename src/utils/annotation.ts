@@ -93,14 +93,14 @@ export const ANNOTATION_INFO: Record<Annotation, AnnotationInfo> = {
         group: "basic",
         name: "Good",
         translationKey: "Good",
-        color: "cyan",
+        color: "lime",
         nag: 1,
     },
     "!?": {
         group: "basic",
         name: "Interesting",
         translationKey: "Interesting",
-        color: "lime",
+        color: "interesting",
         nag: 5,
     },
     "?!": {
