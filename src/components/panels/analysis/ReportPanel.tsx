@@ -78,11 +78,13 @@ function ReportPanel() {
               color={t("Common.WHITE")}
               accuracy={stats.whiteAccuracy}
               cpl={stats.whiteCPL}
+              estimatedRating={stats.whiteEstimatedRating}
             />
             <AccuracyCard
               color={t("Common.BLACK")}
               accuracy={stats.blackAccuracy}
               cpl={stats.blackCPL}
+              estimatedRating={stats.blackEstimatedRating}
             />
           </Group>
         )}
@@ -182,7 +184,17 @@ const GameStats = memo(
   },
 );
 
-function AccuracyCard({ color, cpl, accuracy }: { color: string; cpl: number; accuracy: number }) {
+function AccuracyCard({
+  color,
+  cpl,
+  accuracy,
+  estimatedRating,
+}: {
+  color: string;
+  cpl: number;
+  accuracy: number;
+  estimatedRating: number | null;
+}) {
   const { t } = useTranslation();
 
   return (
@@ -191,6 +203,11 @@ function AccuracyCard({ color, cpl, accuracy }: { color: string; cpl: number; ac
         <Stack gap={0} align="start">
           <Text c="dimmed">{color}</Text>
           <Text fz="sm">{cpl.toFixed(1)} ACPL</Text>
+          {estimatedRating != null && (
+            <Text fz="sm" c="dimmed">
+              {t("Board.Analysis.EstimatedRating")}: ~{estimatedRating}
+            </Text>
+          )}
         </Stack>
         <Stack gap={0} align="center">
           <Text fz="xl" lh="normal">

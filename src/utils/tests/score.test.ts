@@ -1,5 +1,12 @@
 import { expect, test } from "vitest";
-import { formatScore, getAccuracy, getAnnotation, getCPLoss, getWinChance } from "../score";
+import {
+    formatScore,
+    getAccuracy,
+    getAnnotation,
+    getCPLoss,
+    getEstimatedRating,
+    getWinChance,
+} from "../score";
 
 test("should format a positive cp score correctly", () => {
     expect(formatScore({ type: "cp", value: 50 })).toBe("+0.50");
@@ -30,6 +37,16 @@ test("should calculate the accuracy correctly", () => {
 test("should calculate the cp loss correctly", () => {
     expect(getCPLoss({ type: "cp", value: 0 }, { type: "cp", value: 50 }, "black")).toBe(50);
     expect(getCPLoss({ type: "mate", value: -1 }, { type: "cp", value: 0 }, "black")).toBe(1000);
+});
+
+test("should estimate a rating from game accuracy", () => {
+    expect(getEstimatedRating(null)).toBeNull();
+    expect(getEstimatedRating(Number.NaN)).toBeNull();
+    expect(getEstimatedRating(0)).toBe(300);
+    expect(getEstimatedRating(40)).toBe(300);
+    expect(getEstimatedRating(87.5)).toBe(1775);
+    expect(getEstimatedRating(90)).toBe(1950);
+    expect(getEstimatedRating(100)).toBe(2800);
 });
 
 test("should annotate as ??", () => {

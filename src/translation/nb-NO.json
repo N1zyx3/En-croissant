@@ -42,6 +42,7 @@
     "Board.Analysis.EngineRequired": "Computer kreves",
     "Board.Analysis.Engines": "Sjakkcomputere",
     "Board.Analysis.EngineSpeedHint": "",
+    "Board.Analysis.EstimatedRating": "",
     "Board.Analysis.GenerateReport": "Lag rapport",
     "Board.Analysis.GeneratingReport": "Lagger rapport",
     "Board.Analysis.InactiveEngine": "Computern er ikke aktivert",

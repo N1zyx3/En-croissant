@@ -18,7 +18,7 @@ import { commands, type Outcome, type Score, type Token } from "@/bindings";
 import { ANNOTATION_INFO, isBasicAnnotation, NAG_INFO } from "./annotation";
 import { parseSanOrUci, positionFromFen } from "./chessops";
 import { harmonicMean, isPrefix, mean } from "./misc";
-import { formatScore, getAccuracy, getCPLoss, INITIAL_SCORE } from "./score";
+import { formatScore, getAccuracy, getCPLoss, getEstimatedRating, INITIAL_SCORE } from "./score";
 import {
     createNode,
     defaultTree,
@@ -617,6 +617,8 @@ export function getGameStats(root: TreeNode) {
             blackCPL: 0,
             whiteAccuracy: 0,
             blackAccuracy: 0,
+            whiteEstimatedRating: null,
+            blackEstimatedRating: null,
             whiteAnnotations,
             blackAnnotations,
         };
@@ -660,6 +662,8 @@ export function getGameStats(root: TreeNode) {
         blackCPL,
         whiteAccuracy,
         blackAccuracy,
+        whiteEstimatedRating: getEstimatedRating(whiteAccuracy),
+        blackEstimatedRating: getEstimatedRating(blackAccuracy),
         whiteAnnotations,
         blackAnnotations,
     };

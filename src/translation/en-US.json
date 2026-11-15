@@ -42,6 +42,7 @@
     "Board.Analysis.EngineRequired": "Engine is required",
     "Board.Analysis.Engines": "Engines",
     "Board.Analysis.EngineSpeedHint": "How fast the engine is running",
+    "Board.Analysis.EstimatedRating": "Estimated rating",
     "Board.Analysis.GenerateReport": "Generate report",
     "Board.Analysis.GeneratingReport": "Generating report",
     "Board.Analysis.InactiveEngine": "Engine isn't enabled",

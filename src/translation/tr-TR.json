@@ -42,6 +42,7 @@
     "Board.Analysis.EngineRequired": "Motor gerekli",
     "Board.Analysis.Engines": "Motorlar",
     "Board.Analysis.EngineSpeedHint": "Motorun ne kadar hızlı çalıştığı",
+    "Board.Analysis.EstimatedRating": "",
     "Board.Analysis.GenerateReport": "Rapor oluştur",
     "Board.Analysis.GeneratingReport": "Rapor oluşturuluyor",
     "Board.Analysis.InactiveEngine": "Motor aktif değil",

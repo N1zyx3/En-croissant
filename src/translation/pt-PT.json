@@ -42,6 +42,7 @@
     "Board.Analysis.EngineRequired": "Necessário engine",
     "Board.Analysis.Engines": "Engines",
     "Board.Analysis.EngineSpeedHint": "",
+    "Board.Analysis.EstimatedRating": "",
     "Board.Analysis.GenerateReport": "Gerar relatório",
     "Board.Analysis.GeneratingReport": "Gerando relatório",
     "Board.Analysis.InactiveEngine": "Engine não está ligado",

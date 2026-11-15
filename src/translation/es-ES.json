@@ -42,6 +42,7 @@
     "Board.Analysis.EngineRequired": "Motor requerido",
     "Board.Analysis.Engines": "Motores",
     "Board.Analysis.EngineSpeedHint": "",
+    "Board.Analysis.EstimatedRating": "",
     "Board.Analysis.GenerateReport": "Generar reporte",
     "Board.Analysis.GeneratingReport": "Generando reporte",
     "Board.Analysis.InactiveEngine": "Motor no activado",

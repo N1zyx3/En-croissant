@@ -72,6 +72,52 @@ export function getCPLoss(prev: ScoreValue, next: ScoreValue, color: Color): num
     return Math.max(0, prevCP - nextCP);
 }
 
+// Accuracy alone cannot identify a rating exactly: quiet games over-rate and
+// sharp games under-rate the same number. This curve is a deliberately
+// conservative single-game estimate calibrated against reported game-review
+// ratings, interpolating between accuracy percentages.
+const RATING_BY_ACCURACY: ReadonlyArray<readonly [accuracy: number, rating: number]> = [
+    [40, 300],
+    [50, 450],
+    [60, 650],
+    [65, 800],
+    [70, 950],
+    [75, 1100],
+    [80, 1300],
+    [85, 1600],
+    [90, 1950],
+    [93, 2200],
+    [96, 2500],
+    [99, 2800],
+];
+
+export function getEstimatedRating(accuracy: number | null | undefined): number | null {
+    if (accuracy == null || !Number.isFinite(accuracy)) {
+        return null;
+    }
+
+    const clamped = minMax(accuracy, 0, 100);
+    const first = RATING_BY_ACCURACY[0];
+    const last = RATING_BY_ACCURACY[RATING_BY_ACCURACY.length - 1];
+    if (clamped <= first[0]) {
+        return first[1];
+    }
+    if (clamped >= last[0]) {
+        return last[1];
+    }
+
+    for (let i = 1; i < RATING_BY_ACCURACY.length; i++) {
+        const [nextAccuracy, nextRating] = RATING_BY_ACCURACY[i];
+        if (clamped <= nextAccuracy) {
+            const [prevAccuracy, prevRating] = RATING_BY_ACCURACY[i - 1];
+            const progress = (clamped - prevAccuracy) / (nextAccuracy - prevAccuracy);
+            return Math.round(prevRating + progress * (nextRating - prevRating));
+        }
+    }
+
+    return last[1];
+}
+
 export function getAnnotation(
     prevprev: ScoreValue | null,
     prev: ScoreValue | null,

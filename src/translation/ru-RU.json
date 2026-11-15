@@ -42,6 +42,7 @@
     "Board.Analysis.EngineRequired": "Требуется движок",
     "Board.Analysis.Engines": "Движки",
     "Board.Analysis.EngineSpeedHint": "",
+    "Board.Analysis.EstimatedRating": "",
     "Board.Analysis.GenerateReport": "Создать отчёт",
     "Board.Analysis.GeneratingReport": "Создание отчёта",
     "Board.Analysis.InactiveEngine": "Движок не активен",

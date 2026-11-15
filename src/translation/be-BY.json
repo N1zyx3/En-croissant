@@ -42,6 +42,7 @@
     "Board.Analysis.EngineRequired": "Патрэбны рухавік",
     "Board.Analysis.Engines": "Рухавікі",
     "Board.Analysis.EngineSpeedHint": "",
+    "Board.Analysis.EstimatedRating": "",
     "Board.Analysis.GenerateReport": "Стварыць справаздачу",
     "Board.Analysis.GeneratingReport": "Стварэнне справаздачы",
     "Board.Analysis.InactiveEngine": "Рухавік неактыўны",
