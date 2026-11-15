@@ -119,7 +119,6 @@ export function getEstimatedRating(accuracy: number | null | undefined): number 
 }
 
 export function getAnnotation(
-    prevprev: ScoreValue | null,
     prev: ScoreValue | null,
     next: ScoreValue,
     color: Color,
@@ -141,23 +140,16 @@ export function getAnnotation(
     }
 
     if (prevMoves.length > 1) {
+        // Great moves are the best move in a position where every other move
+        // is clearly worse, i.e. the only move that keeps the game on track.
         const scores = normalizeScores(prevMoves[0].score.value, prevMoves[1].score.value, color);
-        if (
+        const isOnlyGoodMove =
             getWinChance(scores.prevCP) - getWinChance(scores.nextCP) > 10 &&
-            move === prevMoves[0].sanMoves[0]
-        ) {
-            const scores = normalizeScores(
-                prevprev || { type: "cp", value: 0 },
-                prevMoves[0].score.value,
-                color,
-            );
-            if (is_sacrifice) {
-                return "!!";
-            }
-            if (getWinChance(scores.nextCP) - getWinChance(scores.prevCP) > 5) {
-                return "!";
-            }
-        } else if (is_sacrifice && nextCP > -200) {
+            move === prevMoves[0].sanMoves[0];
+        if (isOnlyGoodMove) {
+            return is_sacrifice ? "!!" : "‼";
+        }
+        if (is_sacrifice && nextCP > -200) {
             return "!?";
         }
     }

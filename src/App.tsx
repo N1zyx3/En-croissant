@@ -274,6 +274,19 @@ export default function App() {
         "#141517",
         "#101113",
       ],
+      // Interface color matching the "great" move-quality icon.
+      great: [
+        "#f1f5f9",
+        "#e3ebf2",
+        "#cbd9e6",
+        "#adc3d7",
+        "#8fadc9",
+        "#7fa2c2",
+        "#749bbf",
+        "#749bbf",
+        "#749bbf",
+        "#5f7f9e",
+      ],
       // Interface color matching the "interesting" move-quality icon.
       interesting: [
         "#f4f2ff",

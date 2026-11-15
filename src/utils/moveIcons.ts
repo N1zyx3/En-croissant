@@ -40,6 +40,7 @@ export const MOVE_QUALITY_ICON: Record<MoveQuality, string> = {
 /** Map the PGN/analysis annotations that have a matching quality icon. */
 export const ANNOTATION_MOVE_QUALITY: Partial<Record<Annotation, MoveQuality>> = {
     "!!": "brilliant",
+    "‼": "great",
     "!": "correct",
     "!?": "interesting",
     "?!": "inaccuracy",

@@ -114,7 +114,7 @@ const GameStats = memo(
           {Object.keys(ANNOTATION_INFO)
             .filter((a) => isBasicAnnotation(a))
             .map((annotation) => {
-              const s = annotation as "??" | "?" | "?!" | "!!" | "!" | "!?";
+              const s = annotation as "??" | "?" | "?!" | "!!" | "‼" | "!" | "!?";
               const { name, color, translationKey } = ANNOTATION_INFO[s];
               const w = whiteAnnotations[s];
               const b = blackAnnotations[s];

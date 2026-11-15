@@ -721,19 +721,14 @@ function addAnalysis(
         if (pos && !pos.isEnd() && analysis[i].best.length > 0) {
             cur.score = analysis[i].best[0].score;
             let prevScore = null;
-            let prevprevScore = null;
             let prevMoves: BestMoves[] = [];
             if (i > 0) {
                 prevScore = analysis[i - 1].best[0].score;
                 prevMoves = analysis[i - 1].best;
             }
-            if (i > 1) {
-                prevprevScore = analysis[i - 2].best[0].score;
-            }
             const curScore = analysis[i].best[0].score;
             const color = cur.halfMoves % 2 === 1 ? "white" : "black";
             const annotation = getAnnotation(
-                prevprevScore?.value || null,
                 prevScore?.value || null,
                 curScore.value,
                 color,

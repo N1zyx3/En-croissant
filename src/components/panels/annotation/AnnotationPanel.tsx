@@ -47,11 +47,11 @@ const SymbolButton = memo(function SymbolButton({
         style={
           moveQuality
             ? {
-                  opacity: isActive ? 1 : 0.55,
-                  borderRadius: "50%",
-                  boxShadow: isActive
-                      ? `0 0 0 2px var(--mantine-color-${isBasicAnnotation(annotation) ? color : theme.primaryColor}-6)`
-                      : undefined,
+                opacity: isActive ? 1 : 0.55,
+                borderRadius: "50%",
+                boxShadow: isActive
+                  ? `0 0 0 2px var(--mantine-color-${isBasicAnnotation(annotation) ? color : theme.primaryColor}-6)`
+                  : undefined,
               }
             : undefined
         }
@@ -68,7 +68,7 @@ const SymbolButton = memo(function SymbolButton({
 
 const showMoreSymbolsAtom = atom(false);
 
-const BASIC = ["!!", "!", "!?", "?!", "?", "??"] as const;
+const BASIC = ["!!", "‼", "!", "!?", "?!", "?", "??"] as const;
 const ADVANTAGE = ["+-", "±", "⩲", "=", "∞", "⩱", "∓", "-+"] as const;
 const EXTRA = ["N", "↑↑", "↑", "→", "⇆", "=∞", "⊕", "∆", "□", "⨀", "⊗"] as const;
 

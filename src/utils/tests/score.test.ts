@@ -1,4 +1,5 @@
 import { expect, test } from "vitest";
+import type { BestMoves } from "@/bindings";
 import {
     formatScore,
     getAccuracy,
@@ -7,6 +8,18 @@ import {
     getEstimatedRating,
     getWinChance,
 } from "../score";
+
+function engineLines(lines: Array<[cp: number, san: string]>): BestMoves[] {
+    return lines.map(([cp, san], index) => ({
+        nodes: 0,
+        depth: 20,
+        score: { value: { type: "cp", value: cp }, wdl: null },
+        uciMoves: [],
+        sanMoves: [san],
+        multipv: index + 1,
+        nps: 0,
+    }));
+}
 
 test("should format a positive cp score correctly", () => {
     expect(formatScore({ type: "cp", value: 50 })).toBe("+0.50");
@@ -50,21 +63,89 @@ test("should estimate a rating from game accuracy", () => {
 });
 
 test("should annotate as ??", () => {
-    expect(getAnnotation(null, null, { type: "cp", value: -500 }, "white", [])).toBe("??");
-    expect(getAnnotation(null, null, { type: "cp", value: 500 }, "black", [])).toBe("??");
+    expect(getAnnotation(null, { type: "cp", value: -500 }, "white", [])).toBe("??");
+    expect(getAnnotation(null, { type: "cp", value: 500 }, "black", [])).toBe("??");
 });
 
 test("should annotate as ?", () => {
-    expect(getAnnotation(null, null, { type: "cp", value: -200 }, "white", [])).toBe("?");
-    expect(getAnnotation(null, null, { type: "cp", value: 200 }, "black", [])).toBe("?");
+    expect(getAnnotation(null, { type: "cp", value: -200 }, "white", [])).toBe("?");
+    expect(getAnnotation(null, { type: "cp", value: 200 }, "black", [])).toBe("?");
 });
 
 test("should annotate as ?!", () => {
-    expect(getAnnotation(null, null, { type: "cp", value: -100 }, "white", [])).toBe("?!");
-    expect(getAnnotation(null, null, { type: "cp", value: 100 }, "black", [])).toBe("?!");
+    expect(getAnnotation(null, { type: "cp", value: -100 }, "white", [])).toBe("?!");
+    expect(getAnnotation(null, { type: "cp", value: 100 }, "black", [])).toBe("?!");
 });
 
 test("should not annotate", () => {
-    expect(getAnnotation(null, null, { type: "cp", value: -50 }, "white", [])).toBe("");
-    expect(getAnnotation(null, null, { type: "cp", value: 50 }, "black", [])).toBe("");
+    expect(getAnnotation(null, { type: "cp", value: -50 }, "white", [])).toBe("");
+    expect(getAnnotation(null, { type: "cp", value: 50 }, "black", [])).toBe("");
+});
+
+test("should annotate the only good move as great", () => {
+    const prevMoves = engineLines([
+        [200, "e4"],
+        [-200, "d4"],
+    ]);
+    expect(
+        getAnnotation(
+            { type: "cp", value: 0 },
+            { type: "cp", value: 50 },
+            "white",
+            prevMoves,
+            false,
+            "e4",
+        ),
+    ).toBe("‼");
+});
+
+test("should annotate a sacrificing only good move as brilliant", () => {
+    const prevMoves = engineLines([
+        [200, "e4"],
+        [-200, "d4"],
+    ]);
+    expect(
+        getAnnotation(
+            { type: "cp", value: 0 },
+            { type: "cp", value: 50 },
+            "white",
+            prevMoves,
+            true,
+            "e4",
+        ),
+    ).toBe("!!");
+});
+
+test("should not annotate as great when another move is almost as good", () => {
+    const prevMoves = engineLines([
+        [200, "e4"],
+        [100, "d4"],
+    ]);
+    expect(
+        getAnnotation(
+            { type: "cp", value: 0 },
+            { type: "cp", value: 50 },
+            "white",
+            prevMoves,
+            false,
+            "e4",
+        ),
+    ).toBe("");
+});
+
+test("should not annotate as great when the played move is not the best", () => {
+    const prevMoves = engineLines([
+        [200, "e4"],
+        [-200, "d4"],
+    ]);
+    expect(
+        getAnnotation(
+            { type: "cp", value: 0 },
+            { type: "cp", value: 50 },
+            "white",
+            prevMoves,
+            false,
+            "Nf3",
+        ),
+    ).toBe("");
 });

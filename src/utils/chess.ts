@@ -598,6 +598,7 @@ export function getGameStats(root: TreeNode) {
         "?": 0,
         "?!": 0,
         "!!": 0,
+        "‼": 0,
         "!": 0,
         "!?": 0,
     };
@@ -607,6 +608,7 @@ export function getGameStats(root: TreeNode) {
         "?": 0,
         "?!": 0,
         "!!": 0,
+        "‼": 0,
         "!": 0,
         "!?": 0,
     };
