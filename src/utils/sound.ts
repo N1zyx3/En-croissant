@@ -55,7 +55,7 @@ export function playSound(capture: boolean, check: boolean, brilliant = false) {
         if (capture) {
             type = "Capture";
         }
-        if (collection !== "standard" && check) {
+        if (check) {
             type = "Check";
         }
         relativePath = `${collection}/${type}.mp3`;
