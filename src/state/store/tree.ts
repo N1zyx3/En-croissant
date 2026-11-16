@@ -7,7 +7,12 @@ import { createStore, type StateCreator } from "zustand";
 import { persist } from "zustand/middleware";
 import type { BestMoves, Outcome, Score } from "@/bindings";
 import { createDebouncedSessionStorage } from "./debouncedStorage";
-import { ANNOTATION_INFO, type Annotation } from "@/utils/annotation";
+import {
+    ANNOTATION_INFO,
+    type Annotation,
+    sortAnnotations,
+    withBasicAnnotation,
+} from "@/utils/annotation";
 import { getPGN } from "@/utils/chess";
 import { parseSanOrUci, positionFromFen } from "@/utils/chessops";
 import { isPrefix } from "@/utils/misc";
@@ -437,9 +442,7 @@ export const createTreeStore = (id?: string, initialTree?: TreeState) => {
                                     !ANNOTATION_INFO[a].group ||
                                     ANNOTATION_INFO[a].group !== ANNOTATION_INFO[payload].group,
                             );
-                            node.annotations = [...newAnnotations, payload].sort((a, b) =>
-                                ANNOTATION_INFO[a].nag > ANNOTATION_INFO[b].nag ? 1 : -1,
-                            );
+                            node.annotations = sortAnnotations([...newAnnotations, payload]);
                         }
                     }
                     if (brilliant) {
@@ -752,7 +755,7 @@ function addAnalysis(
                         cur.san || "",
                     );
                     if (annotation) {
-                        cur.annotations = [...cur.annotations, annotation];
+                        cur.annotations = withBasicAnnotation(cur.annotations, annotation);
 
                         if (
                             options?.showVariations &&
@@ -825,10 +828,7 @@ function addAnalysis(
                     if (analysis[i].novelty) {
                         cur.annotations = [...cur.annotations, "N"];
                     }
-                    cur.annotations = [...new Set(cur.annotations)];
-                    cur.annotations.sort((a, b) =>
-                        ANNOTATION_INFO[a].nag > ANNOTATION_INFO[b].nag ? 1 : -1,
-                    );
+                    cur.annotations = sortAnnotations(cur.annotations);
                 }
             }
         }

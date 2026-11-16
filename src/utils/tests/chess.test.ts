@@ -1,5 +1,11 @@
 import { expect, test, vi } from "vitest";
-import { ANNOTATION_INFO, type Annotation, NAG_INFO } from "../annotation";
+import {
+    ANNOTATION_INFO,
+    type Annotation,
+    NAG_INFO,
+    sortAnnotations,
+    withBasicAnnotation,
+} from "../annotation";
 import { parseSquare } from "chessops";
 import type { GameHeaders } from "../treeReducer";
 import { getMoveDestination, hasMorePriority, headersToPGN, parsePGN } from "../chess";
@@ -33,6 +39,31 @@ test("NAGs are consistent", () => {
         const nag = ANNOTATION_INFO[k as Annotation].nag!;
         expect(NAG_INFO.get(`$${nag}`)).toBe(k);
     }
+});
+
+test("move qualities are ordered from brilliant to blunder", () => {
+    expect(sortAnnotations(["??", "?", "?!", "!", "!?", "‼", "!!"])).toEqual([
+        "!!",
+        "‼",
+        "!?",
+        "!",
+        "?!",
+        "?",
+        "??",
+    ]);
+    expect(
+        Object.keys(ANNOTATION_INFO).filter(
+            (a) => ANNOTATION_INFO[a as Annotation].group === "basic",
+        ),
+    ).toEqual(["!!", "‼", "!?", "!", "?!", "?", "??"]);
+});
+
+test("competing move qualities resolve to the highest-ranked one", () => {
+    expect(withBasicAnnotation([], "??")).toEqual(["??"]);
+    expect(withBasicAnnotation(["??"], "!")).toEqual(["!"]);
+    expect(withBasicAnnotation(["!!"], "??")).toEqual(["!!"]);
+    expect(withBasicAnnotation(["?"], "?!")).toEqual(["?!"]);
+    expect(withBasicAnnotation(["!", "N"], "!?")).toEqual(["!?", "N"]);
 });
 
 test("priority comparison", () => {

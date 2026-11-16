@@ -98,19 +98,19 @@ export const ANNOTATION_INFO: Record<Annotation, AnnotationInfo> = {
         color: "great",
         nag: 8,
     },
-    "!": {
-        group: "basic",
-        name: "Good",
-        translationKey: "Good",
-        color: "lime",
-        nag: 1,
-    },
     "!?": {
         group: "basic",
         name: "Interesting",
         translationKey: "Interesting",
         color: "interesting",
         nag: 5,
+    },
+    "!": {
+        group: "basic",
+        name: "Good",
+        translationKey: "Good",
+        color: "lime",
+        nag: 1,
     },
     "?!": {
         group: "basic",
@@ -202,4 +202,56 @@ export function isBasicAnnotation(
     annotation: string,
 ): annotation is "!" | "!!" | "‼" | "?" | "??" | "!?" | "?!" {
     return ["!", "!!", "‼", "?", "??", "!?", "?!"].includes(annotation);
+}
+
+/**
+ * Move-quality annotations ordered from highest to lowest priority.
+ *
+ * A move has at most one of these. When several would apply (for example after
+ * re-running the engine at a different depth), the highest-ranked one wins.
+ */
+export const BASIC_ANNOTATION_ORDER = [
+    "!!",
+    "‼",
+    "!?",
+    "!",
+    "?!",
+    "?",
+    "??",
+] as const satisfies readonly Annotation[];
+
+export function getAnnotationRank(annotation: Annotation): number {
+    const rank = (BASIC_ANNOTATION_ORDER as readonly Annotation[]).indexOf(annotation);
+    return rank === -1 ? Number.POSITIVE_INFINITY : rank;
+}
+
+/** Sort annotations so the highest-ranked move quality comes first. */
+export function compareAnnotations(a: Annotation, b: Annotation): number {
+    const byRank = getAnnotationRank(a) - getAnnotationRank(b);
+    return byRank !== 0 ? byRank : ANNOTATION_INFO[a].nag - ANNOTATION_INFO[b].nag;
+}
+
+/** Deduplicate and order annotations, highest move quality first. */
+export function sortAnnotations(annotations: readonly Annotation[]): Annotation[] {
+    return [...new Set(annotations)].sort(compareAnnotations);
+}
+
+/**
+ * Add a move-quality annotation while keeping only the highest-ranked quality
+ * for the move. Annotations from other groups (novelty, advantage, ...) are
+ * preserved.
+ */
+export function withBasicAnnotation(
+    annotations: readonly Annotation[],
+    annotation: Annotation,
+): Annotation[] {
+    if (!isBasicAnnotation(annotation)) {
+        return sortAnnotations([...annotations, annotation]);
+    }
+
+    const others = annotations.filter((a) => !isBasicAnnotation(a));
+    const winner = [annotation, ...annotations.filter(isBasicAnnotation)].reduce((best, current) =>
+        getAnnotationRank(current) < getAnnotationRank(best) ? current : best,
+    );
+    return sortAnnotations([...others, winner]);
 }

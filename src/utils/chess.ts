@@ -15,7 +15,7 @@ import { INITIAL_FEN, makeFen, parseFen } from "chessops/fen";
 import { isPawns, parseComment } from "chessops/pgn";
 import { makeSan, parseSan } from "chessops/san";
 import { commands, type Outcome, type Score, type Token } from "@/bindings";
-import { ANNOTATION_INFO, isBasicAnnotation, NAG_INFO } from "./annotation";
+import { ANNOTATION_INFO, isBasicAnnotation, NAG_INFO, sortAnnotations } from "./annotation";
 import { parseSanOrUci, positionFromFen } from "./chessops";
 import { harmonicMean, isPrefix, mean } from "./misc";
 import { formatScore, getAccuracy, getCPLoss, getEstimatedRating, INITIAL_SCORE } from "./score";
@@ -468,9 +468,7 @@ export function innerParsePGN(
             const annotation = NAG_INFO.get(token.value);
             if (annotation) root.annotations.push(annotation);
             else (root.unknownNags ??= []).push(Number(token.value.slice(1)));
-            root.annotations.sort((a, b) => {
-                return ANNOTATION_INFO[a].nag - ANNOTATION_INFO[b].nag;
-            });
+            root.annotations = sortAnnotations(root.annotations);
         } else if (token.type === "San") {
             const [pos, error] = positionFromFen(root.fen);
             if (error) {
