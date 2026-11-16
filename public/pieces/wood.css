@@ -1,0 +1,12 @@
+.pawn.white {background-image:url('wood/wp.png')}
+.knight.white {background-image:url('wood/wn.png')}
+.bishop.white {background-image:url('wood/wb.png')}
+.rook.white {background-image:url('wood/wr.png')}
+.queen.white {background-image:url('wood/wq.png')}
+.king.white {background-image:url('wood/wk.png')}
+.pawn.black {background-image:url('wood/bp.png')}
+.knight.black {background-image:url('wood/bn.png')}
+.bishop.black {background-image:url('wood/bb.png')}
+.rook.black {background-image:url('wood/br.png')}
+.queen.black {background-image:url('wood/bq.png')}
+.king.black {background-image:url('wood/bk.png')}

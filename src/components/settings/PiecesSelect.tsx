@@ -51,6 +51,7 @@ const pieceSets2d: Item[] = [
   { label: "Spatial", value: "spatial" },
   { label: "Staunty", value: "staunty" },
   { label: "Tatiana", value: "tatiana" },
+  { label: "Wood", value: "wood" },
 ];
 
 const pieceSets3d = [
