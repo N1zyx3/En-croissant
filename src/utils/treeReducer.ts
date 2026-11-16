@@ -24,6 +24,8 @@ export interface TreeNode {
     shapes: DrawShape[];
     annotations: Annotation[];
     comment: string;
+    // True when the move that produced this position is in the opening book.
+    book?: boolean;
     clock?: number;
     elapsedTime?: number;
     unknownNags?: number[];

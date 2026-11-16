@@ -10,14 +10,16 @@ export default function AnnotationHint({
   square,
   annotation,
   orientation,
+  book,
 }: {
   square: Square;
   annotation: Annotation;
   orientation: Color;
+  book?: boolean;
 }) {
   const { file, rank } = squareToCoordinates(square, orientation);
   const color = ANNOTATION_INFO[annotation]?.color || "gray";
-  const moveQuality = getMoveQualityForAnnotation(annotation);
+  const moveQuality = book ? "book" : getMoveQualityForAnnotation(annotation);
 
   return (
     <Box

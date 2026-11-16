@@ -11,6 +11,7 @@ import { ANNOTATION_INFO, type Annotation } from "@/utils/annotation";
 import { getPGN } from "@/utils/chess";
 import { parseSanOrUci, positionFromFen } from "@/utils/chessops";
 import { isPrefix } from "@/utils/misc";
+import { getOpeningName } from "@/utils/openings";
 import { getAnnotation } from "@/utils/score";
 import { playSound } from "@/utils/sound";
 import {
@@ -77,7 +78,7 @@ export interface TreeStoreState extends TreeState {
             novelty: boolean;
             is_sacrifice: boolean;
         }[],
-        options?: { showVariations: boolean },
+        options?: { showVariations: boolean; annotateOpeningBook?: boolean },
     ) => void;
 
     setReportInProgress: (value: boolean) => void;
@@ -710,7 +711,7 @@ function addAnalysis(
         novelty: boolean;
         is_sacrifice: boolean;
     }[],
-    options?: { showVariations: boolean },
+    options?: { showVariations: boolean; annotateOpeningBook?: boolean },
 ) {
     let cur = state.root;
     let i = 0;
@@ -718,97 +719,118 @@ function addAnalysis(
 
     while (cur !== undefined && i < analysis.length) {
         const [pos] = positionFromFen(cur.fen);
-        if (pos && !pos.isEnd() && analysis[i].best.length > 0) {
-            cur.score = analysis[i].best[0].score;
-            let prevScore = null;
-            let prevMoves: BestMoves[] = [];
-            if (i > 0) {
-                prevScore = analysis[i - 1].best[0].score;
-                prevMoves = analysis[i - 1].best;
+        if (pos && !pos.isEnd()) {
+            const openingName = options?.annotateOpeningBook ? getOpeningName(cur.fen) : undefined;
+            if (openingName) {
+                cur.book = true;
+                if (!cur.comment.trim()) {
+                    cur.comment = openingName;
+                }
             }
-            const curScore = analysis[i].best[0].score;
-            const color = cur.halfMoves % 2 === 1 ? "white" : "black";
-            const annotation = getAnnotation(
-                prevScore?.value || null,
-                curScore.value,
-                color,
-                prevMoves,
-                analysis[i].is_sacrifice,
-                cur.san || "",
-            );
-            if (annotation) {
-                cur.annotations = [...cur.annotations, annotation];
 
-                if (
-                    options?.showVariations &&
-                    (annotation === "??" || annotation === "?" || annotation === "?!") &&
-                    parent &&
-                    i > 0 &&
-                    analysis[i - 1].best.length > 0
-                ) {
-                    const bestMoveUci = analysis[i - 1].best[0].uciMoves[0];
-                    const [parentPos] = positionFromFen(parent.fen);
-                    if (parentPos) {
-                        const bestMove = parseUci(bestMoveUci);
-                        if (bestMove) {
-                            const existingChild = parent.children.find(
-                                (c) =>
-                                    c.move &&
-                                    isNormal(c.move) &&
-                                    isNormal(bestMove) &&
-                                    c.move.from === bestMove.from &&
-                                    c.move.to === bestMove.to &&
-                                    c.move.promotion === bestMove.promotion,
-                            );
+            if (analysis[i].best.length > 0) {
+                cur.score = analysis[i].best[0].score;
 
-                            if (!existingChild) {
-                                const san = makeSan(parentPos, bestMove);
-                                parentPos.play(bestMove);
-                                const newFen = makeFen(parentPos.toSetup());
-                                const variationNode = createNode({
-                                    fen: newFen,
-                                    move: bestMove,
-                                    san,
-                                    halfMoves: parent.halfMoves + 1,
-                                });
+                // Known opening moves are marked with the book icon instead of a
+                // move-quality annotation: the engine verdict is irrelevant while
+                // the line is still following theory.
+                if (!openingName) {
+                    let prevScore = null;
+                    let prevMoves: BestMoves[] = [];
+                    if (i > 0) {
+                        prevScore = analysis[i - 1].best[0].score;
+                        prevMoves = analysis[i - 1].best;
+                    }
+                    const curScore = analysis[i].best[0].score;
+                    const color = cur.halfMoves % 2 === 1 ? "white" : "black";
+                    const annotation = getAnnotation(
+                        prevScore?.value || null,
+                        curScore.value,
+                        color,
+                        prevMoves,
+                        analysis[i].is_sacrifice,
+                        cur.san || "",
+                    );
+                    if (annotation) {
+                        cur.annotations = [...cur.annotations, annotation];
 
-                                let currentVarNode = variationNode;
-                                const currentVarPos = parentPos;
+                        if (
+                            options?.showVariations &&
+                            (annotation === "??" || annotation === "?" || annotation === "?!") &&
+                            parent &&
+                            i > 0 &&
+                            analysis[i - 1].best.length > 0
+                        ) {
+                            const bestMoveUci = analysis[i - 1].best[0].uciMoves[0];
+                            const [parentPos] = positionFromFen(parent.fen);
+                            if (parentPos) {
+                                const bestMove = parseUci(bestMoveUci);
+                                if (bestMove) {
+                                    const existingChild = parent.children.find(
+                                        (c) =>
+                                            c.move &&
+                                            isNormal(c.move) &&
+                                            isNormal(bestMove) &&
+                                            c.move.from === bestMove.from &&
+                                            c.move.to === bestMove.to &&
+                                            c.move.promotion === bestMove.promotion,
+                                    );
 
-                                const pv = analysis[i - 1].best[0].uciMoves;
-                                if (pv.length > 1) {
-                                    for (let j = 1; j < Math.min(pv.length, 10); j++) {
-                                        const nextMoveUci = pv[j];
-                                        const nextMove = parseUci(nextMoveUci);
-                                        if (nextMove) {
-                                            const nextSan = makeSan(currentVarPos, nextMove);
-                                            currentVarPos.play(nextMove);
-                                            const nextFen = makeFen(currentVarPos.toSetup());
-                                            const nextNode = createNode({
-                                                fen: nextFen,
-                                                move: nextMove,
-                                                san: nextSan,
-                                                halfMoves: currentVarNode.halfMoves + 1,
-                                            });
-                                            currentVarNode.children.push(nextNode);
-                                            currentVarNode = nextNode;
+                                    if (!existingChild) {
+                                        const san = makeSan(parentPos, bestMove);
+                                        parentPos.play(bestMove);
+                                        const newFen = makeFen(parentPos.toSetup());
+                                        const variationNode = createNode({
+                                            fen: newFen,
+                                            move: bestMove,
+                                            san,
+                                            halfMoves: parent.halfMoves + 1,
+                                        });
+
+                                        let currentVarNode = variationNode;
+                                        const currentVarPos = parentPos;
+
+                                        const pv = analysis[i - 1].best[0].uciMoves;
+                                        if (pv.length > 1) {
+                                            for (let j = 1; j < Math.min(pv.length, 10); j++) {
+                                                const nextMoveUci = pv[j];
+                                                const nextMove = parseUci(nextMoveUci);
+                                                if (nextMove) {
+                                                    const nextSan = makeSan(
+                                                        currentVarPos,
+                                                        nextMove,
+                                                    );
+                                                    currentVarPos.play(nextMove);
+                                                    const nextFen = makeFen(
+                                                        currentVarPos.toSetup(),
+                                                    );
+                                                    const nextNode = createNode({
+                                                        fen: nextFen,
+                                                        move: nextMove,
+                                                        san: nextSan,
+                                                        halfMoves: currentVarNode.halfMoves + 1,
+                                                    });
+                                                    currentVarNode.children.push(nextNode);
+                                                    currentVarNode = nextNode;
+                                                }
+                                            }
                                         }
+
+                                        parent.children.push(variationNode);
                                     }
                                 }
-
-                                parent.children.push(variationNode);
                             }
                         }
                     }
+                    if (analysis[i].novelty) {
+                        cur.annotations = [...cur.annotations, "N"];
+                    }
+                    cur.annotations = [...new Set(cur.annotations)];
+                    cur.annotations.sort((a, b) =>
+                        ANNOTATION_INFO[a].nag > ANNOTATION_INFO[b].nag ? 1 : -1,
+                    );
                 }
             }
-            if (analysis[i].novelty) {
-                cur.annotations = [...cur.annotations, "N"];
-            }
-            cur.annotations = [...new Set(cur.annotations)];
-            cur.annotations.sort((a, b) =>
-                ANNOTATION_INFO[a].nag > ANNOTATION_INFO[b].nag ? 1 : -1,
-            );
         }
         parent = cur;
         cur = cur.children[0];

@@ -435,7 +435,7 @@ function Board({
             gap="sm"
           >
             {showComments &&
-              currentNode.annotations.length > 0 &&
+              (currentNode.annotations.length > 0 || currentNode.book) &&
               currentNode.move &&
               square !== undefined && (
                 <Box pl="2.5rem" w="100%" h="100%" pos="absolute">
@@ -443,7 +443,8 @@ function Board({
                     <AnnotationHint
                       orientation={orientation}
                       square={square}
-                      annotation={currentNode.annotations[0]}
+                      annotation={currentNode.annotations[0] ?? ""}
+                      book={currentNode.book}
                     />
                   </Box>
                 </Box>

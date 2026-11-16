@@ -568,6 +568,40 @@ test("should handle addAnalysis", () => {
     });
 });
 
+test("should mark opening book moves in the report", () => {
+    const bestMoves = (san: string, uci: string) => [
+        {
+            depth: 1,
+            multipv: 1,
+            nodes: 1,
+            score: {
+                value: {
+                    type: "cp" as const,
+                    value: 20,
+                },
+                wdl: null,
+            },
+            nps: 1000,
+            sanMoves: [san],
+            uciMoves: [uci],
+        },
+    ];
+
+    store.setState(treeE4D5());
+    store.getState().addAnalysis(
+        [
+            { best: bestMoves("e4", "e2e4"), novelty: false, is_sacrifice: false },
+            { best: bestMoves("d5", "d7d5"), novelty: false, is_sacrifice: false },
+        ],
+        { showVariations: false, annotateOpeningBook: true },
+    );
+
+    const e4 = store.getState().root.children[0];
+    expect(e4.book).toBe(true);
+    expect(e4.comment).toBe("King's Pawn Game");
+    expect(e4.annotations).toEqual([]);
+});
+
 test("should handle promoteVariation", () => {
     store.setState(treeE4D5Nf3());
     store.getState().promoteVariation([1]);

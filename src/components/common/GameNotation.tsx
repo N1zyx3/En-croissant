@@ -216,6 +216,7 @@ const RenderVariationTree = memo(
                 targetRef={targetRef}
                 annotations={variation.annotations}
                 comment={variation.comment}
+                book={variation.book}
                 halfMoves={variation.halfMoves}
                 move={moveNotationType === "lan" ? makeLan(variation) : variation.san}
                 fen={variation.fen}
@@ -237,6 +238,7 @@ const RenderVariationTree = memo(
             targetRef={targetRef}
             annotations={variations[0].annotations}
             comment={variations[0].comment}
+            book={variations[0].book}
             halfMoves={variations[0].halfMoves}
             move={moveNotationType === "lan" ? makeLan(variations[0]) : variations[0].san}
             fen={variations[0].fen}
@@ -476,6 +478,7 @@ const TableNotation = memo(function TableNotation({
                             targetRef={targetRef}
                             annotations={variation.annotations}
                             comment={variation.comment}
+                            book={variation.book}
                             halfMoves={variation.halfMoves}
                             move={moveNotationType === "lan" ? makeLan(variation) : variation.san}
                             fen={variation.fen}
@@ -541,6 +544,7 @@ function RowSegment({
             targetRef={targetRef}
             annotations={white.annotations}
             comment={white.comment}
+            book={white.book}
             halfMoves={white.halfMoves}
             move={moveNotationType === "lan" ? makeLan(white) : white.san}
             fen={white.fen}
@@ -561,6 +565,7 @@ function RowSegment({
             targetRef={targetRef}
             annotations={black.annotations}
             comment={black.comment}
+            book={black.book}
             halfMoves={black.halfMoves}
             move={moveNotationType === "lan" ? makeLan(black) : black.san}
             fen={black.fen}

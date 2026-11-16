@@ -13,6 +13,7 @@ interface MoveCellProps {
   isStart: boolean;
   isCurrentVariation: boolean;
   move: string;
+  book?: boolean;
   onClick: () => void;
   onContextMenu: (e: React.MouseEvent) => void;
   fullWidth?: boolean;
@@ -68,6 +69,15 @@ function MoveCell(props: MoveCellProps) {
       <Box component="span" className={classes.moveText}>
         {props.isStart && <IconFlag style={{ marginRight: 5 }} size="0.875rem" />}
         {moveNotationType === "symbols" ? addPieceSymbol(props.move) : props.move}
+        {showComments && props.book && (
+          <MoveQualityIcon
+            quality="book"
+            alt="Book"
+            w={16}
+            h={16}
+            style={{ marginLeft: 2, flexShrink: 0 }}
+          />
+        )}
         {showComments &&
           props.annotations.map((annotation) => {
             const moveQuality = getMoveQualityForAnnotation(annotation);

@@ -97,6 +97,7 @@ function ReportModal({
         if (analysis.status === "ok") {
           addAnalysis(analysis.data, {
             showVariations: form.values.variations,
+            annotateOpeningBook: true,
           });
         }
       })

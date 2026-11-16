@@ -136,6 +136,7 @@ function CompleteMoveCell({
   fen,
   comment,
   annotations,
+  book,
   showComments,
   first,
   targetRef,
@@ -145,6 +146,7 @@ function CompleteMoveCell({
   halfMoves: number;
   comment: string;
   annotations: Annotation[];
+  book?: boolean;
   showComments: boolean;
   move?: string | null;
   fen?: string;
@@ -177,6 +179,7 @@ function CompleteMoveCell({
       ref={ref as RefObject<HTMLButtonElement>}
       move={move!}
       annotations={annotations}
+      book={book}
       isStart={isStart}
       isCurrentVariation={isCurrentVariation}
       onClick={() => goToMove(movePath)}
@@ -236,6 +239,7 @@ export default memo(CompleteMoveCell, (prev, next) => {
     prev.fen === next.fen &&
     prev.comment === next.comment &&
     equal(prev.annotations, next.annotations) &&
+    prev.book === next.book &&
     prev.showComments === next.showComments &&
     prev.first === next.first &&
     equal(prev.movePath, next.movePath) &&
